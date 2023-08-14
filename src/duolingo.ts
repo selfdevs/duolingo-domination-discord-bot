@@ -56,7 +56,39 @@ export const getLeaderboard = async (channelId: string): Promise<void> => {
     await axios.post(
       url,
       {
-        content: prettierLeaderboard(sortedLeaderboard),
+        embeds: [
+          {
+            title: '🦜 SELF.DEV Duolingo Domination Leaderboard 🦜',
+            fields: [
+              {
+                name: 'Streak',
+                value: sortedLeaderboard
+                  .map(
+                    ({ streak }, index) =>
+                      `${streak > 0 ? '🔥' : ''} ${
+                        index < 6 ? '__' : ''
+                      }${streak} days${index < 6 ? '__' : ''}`,
+                  )
+                  .join('\n'),
+                inline: true,
+              },
+              {
+                name: 'Username',
+                value: sortedLeaderboard
+                  .map(({ username }, index) => `${index + 1} ${username}`)
+                  .join('\n'),
+                inline: true,
+              },
+              {
+                name: 'XP',
+                value: sortedLeaderboard
+                  .map(({ points }) => `${points} XP`)
+                  .join('\n'),
+                inline: true,
+              },
+            ],
+          },
+        ],
       },
       {
         headers: {

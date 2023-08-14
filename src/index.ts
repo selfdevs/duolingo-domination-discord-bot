@@ -8,7 +8,7 @@ import {
 import { getDiscordCredentials } from './discordCredentials';
 import axios from 'axios';
 import { handleAxiosError } from './axios';
-import { getLeaderboard, prettierLeaderboard } from './duolingo';
+import { getLeaderboard } from './duolingo';
 
 config();
 

@@ -1,4 +1,4 @@
-FROM node:lts
+FROM node:lts-slim
 
 ENV npm_config_arch=x64
 ENV npm_config_platform=linuxmusl

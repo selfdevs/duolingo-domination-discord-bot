@@ -1,14 +1,15 @@
-import { config } from 'dotenv';
-import express from 'express';
 import {
   InteractionResponseType,
   InteractionType,
   verifyKeyMiddleware,
 } from 'discord-interactions';
-import { getDiscordCredentials } from './discordCredentials';
 import axios from 'axios';
-import { handleAxiosError } from './axios';
+import { config } from 'dotenv';
+import express from 'express';
+
+import { getDiscordCredentials } from './discord/auth';
 import { getLeaderboard } from './duolingo';
+import { handleAxiosError } from './axios';
 
 config();
 
@@ -21,7 +22,7 @@ app.post(
     try {
       console.log('interactions endpoint called');
       const message = req.body;
-      getLeaderboard(message.channel_id);
+      void getLeaderboard(message.channel_id);
       if (message.type === InteractionType.APPLICATION_COMMAND) {
         console.log('interaction type is APPLICATION_COMMAND');
       }

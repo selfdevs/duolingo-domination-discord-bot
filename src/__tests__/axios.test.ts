@@ -6,7 +6,7 @@ describe('handleAxiosError', () => {
     jest.clearAllMocks();
   });
 
-  it('should log the response status and data when the error is an instance of AxiosError', () => {
+  it('should log the response status when the error is an instance of AxiosError', () => {
     const error = new AxiosError('not found', '404', undefined, null, {
       status: 404,
       data: 'Not Found',
@@ -18,8 +18,7 @@ describe('handleAxiosError', () => {
     });
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     handleAxiosError(error);
-    expect(consoleSpy).toHaveBeenCalledWith(404);
-    expect(consoleSpy).toHaveBeenCalledWith('Not Found');
+    expect(consoleSpy).toHaveBeenCalledWith('Axios error, status:', 404);
   });
 
   it('should not log anything when the error is not an instance of AxiosError', () => {

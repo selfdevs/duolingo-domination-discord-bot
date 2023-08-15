@@ -1,19 +1,8 @@
 import { createCanvas, registerFont, Image } from 'canvas';
-import { prettierLeaderboard } from '../duolingo';
 import { User } from '../types';
-import { readFile } from 'fs';
 
-export function createEmbed(title: string, description: string) {
+export function createEmbed() {
   return {
-    // embeds: [
-    //   {
-    //     // title,
-    //     // description: '',
-    //     image: {
-    //       url: 'attachment://image.png',
-    //     },
-    //   },
-    // ],
     attachments: [
       {
         id: 0,
@@ -29,27 +18,27 @@ export function createLeaderboardCanvas(sortedLeaderboard: User[]) {
   const canvas = createCanvas(960, 1280);
   const ctx = canvas.getContext('2d');
   ctx.font = '64px Feather';
-  ctx.fillStyle = '#00003a';
+  ctx.fillStyle = '#100f3ed9';
   ctx.roundRect(0, 0, 960, 1280, 64);
   ctx.fill();
   ctx.fillStyle = '#7AC70C';
   ctx.fillText('Duolingo Domination Leaderboard', 64, 256, 860);
   ctx.font = '32px Feather';
   ctx.fillStyle = '#FFFFFF';
-  // ctx.fillText(prettierLeaderboard(sortedLeaderboard), 64, 360, 860);
   sortedLeaderboard.forEach((user, index) => {
+    ctx.fillText(`${index + 1}.️`, 44, 320 + 64 * index, 860);
     if (user.streak > 0) {
       const image = new Image();
-      image.onload = () => ctx.drawImage(image, 144, 288 + 64 * index, 32, 32);
+      image.onload = () => ctx.drawImage(image, 104, 288 + 64 * index, 32, 32);
       image.onerror = (err: Error) => {
         throw err;
       };
       image.src = './src/fire.png';
     }
-    ctx.fillText(`${index + 1}.️`, 64, 320 + 64 * index, 860);
-    ctx.fillText(`${user.streak} days`, 196, 320 + 64 * index, 860);
-    ctx.fillText(`${user.name}`, 380, 320 + 64 * index, 860);
-    ctx.fillText(`${user.totalXp} XP`, 720, 320 + 64 * index, 860);
+    ctx.fillText(`${user.streak} days`, 156, 320 + 64 * index, 860);
+    ctx.fillText(`${user.name}`, 320, 320 + 64 * index, 860);
+    ctx.fillText(`${user.totalXp} XP`, 640, 320 + 64 * index, 860);
+    ctx.fillText(` + ${user.lastWeekXP}`, 800, 320 + 64 * index, 860);
   });
 
   const image = new Image();
@@ -58,5 +47,20 @@ export function createLeaderboardCanvas(sortedLeaderboard: User[]) {
     throw err;
   };
   image.src = './src/logo.png';
+  const targetImage = new Image();
+  targetImage.onload = () => ctx.drawImage(targetImage, 800, 68, 84, 76);
+  targetImage.onerror = (err: Error) => {
+    throw err;
+  };
+  targetImage.src = './src/target.png';
+  const gemImage = new Image();
+  gemImage.onload = () => {
+    ctx.drawImage(gemImage, 100, 88, 48, 60);
+    ctx.drawImage(gemImage, 120, 108, 48, 60);
+  };
+  gemImage.onerror = (err: Error) => {
+    throw err;
+  };
+  gemImage.src = './src/gem.png';
   return canvas;
 }

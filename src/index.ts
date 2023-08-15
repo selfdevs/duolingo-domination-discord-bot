@@ -29,7 +29,7 @@ app.post(
       res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-          content: 'Wait a second...',
+          content: 'Here is the leaderboard!',
         },
       });
     } catch (error) {

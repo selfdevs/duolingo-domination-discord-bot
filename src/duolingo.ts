@@ -3,8 +3,8 @@ import axios from 'axios';
 import { User } from './types';
 import { handleAxiosError } from './axios';
 
-export async function getUser(username: string): Promise<User> {
-  const url = BASE_URL + USER_ENDPOINT + username;
+export async function getUser(id: string): Promise<User> {
+  const url = BASE_URL + USER_ENDPOINT + id;
   try {
     const response = await axios.get<User>(url, {
       headers: {
@@ -13,18 +13,15 @@ export async function getUser(username: string): Promise<User> {
           'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/85.0.4183.83 Chrome/85.0.4183.83 Safari/537.36',
       },
     });
-    console.log('got user', username);
+    console.log('got user', id);
     return response.data;
   } catch (error) {
-    console.log('error getting user', username);
+    console.log('error getting user', id);
     handleAxiosError(error);
     return {
-      language_data: {
-        fr: {
-          points: 0,
-          streak: 0,
-        },
-      },
+      name: 'unknown',
+      streak: 0,
+      totalXp: 0,
     };
   }
 }
@@ -32,13 +29,12 @@ export async function getUser(username: string): Promise<User> {
 export const getLeaderboard = async (channelId: string): Promise<void> => {
   console.log('getting leaderboard');
   const leaderboard = await Promise.all(
-    users.map(async (username) => {
-      const user = await getUser(username);
-      console.log('got user', username);
+    users.map(async (id) => {
+      const user = await getUser(id);
       return {
-        username,
-        points: sumPoints(user),
-        streak: getBestStreak(user),
+        username: user.name,
+        points: user.totalXp,
+        streak: user.streak,
       };
     }),
   );
@@ -58,35 +54,8 @@ export const getLeaderboard = async (channelId: string): Promise<void> => {
       {
         embeds: [
           {
-            title: '🦜 SELF.DEV Duolingo Domination Leaderboard 🦜',
-            fields: [
-              {
-                name: 'Streak',
-                value: sortedLeaderboard
-                  .map(
-                    ({ streak }, index) =>
-                      `${streak > 0 ? '🔥' : ''} ${
-                        index < 6 ? '__' : ''
-                      }${streak} days${index < 6 ? '__' : ''}`,
-                  )
-                  .join('\n'),
-                inline: true,
-              },
-              {
-                name: 'Username',
-                value: sortedLeaderboard
-                  .map(({ username }, index) => `${index + 1} ${username}`)
-                  .join('\n'),
-                inline: true,
-              },
-              {
-                name: 'XP',
-                value: sortedLeaderboard
-                  .map(({ points }) => `${points} XP`)
-                  .join('\n'),
-                inline: true,
-              },
-            ],
+            title: '🦜 Duolingo Domination Leaderboard 🦜',
+            description: prettierLeaderboard(sortedLeaderboard),
           },
         ],
       },
@@ -101,18 +70,6 @@ export const getLeaderboard = async (channelId: string): Promise<void> => {
     handleAxiosError(error);
   }
 };
-
-function sumPoints(user: User) {
-  return Object.values(user.language_data).reduce((total, { points }) => {
-    return total + points;
-  }, 0);
-}
-
-function getBestStreak(user: User) {
-  return Object.values(user.language_data).reduce((bestStreak, { streak }) => {
-    return Math.max(bestStreak, streak);
-  }, 0);
-}
 
 type LeaderboardEntry = {
   username: string;

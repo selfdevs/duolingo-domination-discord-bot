@@ -5,6 +5,12 @@ type DiscordCredentials = {
   scope: string;
 };
 
+export function generateClientCredentialsHeaders(accessToken: string) {
+  return {
+    Authorization: `Bearer ${accessToken}`,
+  };
+}
+
 export async function getDiscordCredentials(): Promise<DiscordCredentials> {
   const response = await axios.post<DiscordCredentials>(
     'https://discord.com/api/v10/oauth2/token',
@@ -21,6 +27,7 @@ export async function getDiscordCredentials(): Promise<DiscordCredentials> {
       },
     },
   );
-  console.log(response.data);
+  console.info(`Successfully obtained Discord client credentials`);
+
   return response.data;
 }

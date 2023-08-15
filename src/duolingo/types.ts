@@ -4,3 +4,9 @@ export type User = {
   lastWeekXP: number;
   name: string;
 };
+
+export type XPSummaries = {
+  summaries: Array<{
+    gainedXp: number;
+  }>;
+};

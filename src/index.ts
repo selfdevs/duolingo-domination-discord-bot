@@ -1,15 +1,10 @@
-import {
-  InteractionResponseType,
-  InteractionType,
-  verifyKeyMiddleware,
-} from 'discord-interactions';
-import axios from 'axios';
+import { verifyKeyMiddleware } from 'discord-interactions';
 import { config } from 'dotenv';
 import express from 'express';
 
-import { getDiscordCredentials } from './discord/auth';
-import { getLeaderboard } from './duolingo';
-import { handleAxiosError } from './axios';
+import { handleError } from './utils';
+import { createDiscordCommand } from './discord/commands';
+import { handleInteraction } from './discord/interations';
 
 config();
 
@@ -18,50 +13,20 @@ const app = express();
 app.post(
   '/interactions',
   verifyKeyMiddleware(process.env.DISCORD_PUBLIC_KEY as string),
-  async (req, res) => {
-    try {
-      console.log('interactions endpoint called');
-      const message = req.body;
-      void getLeaderboard(message.channel_id);
-      if (message.type === InteractionType.APPLICATION_COMMAND) {
-        console.log('interaction type is APPLICATION_COMMAND');
-      }
-      res.send({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          content: 'Here is the leaderboard!',
-        },
-      });
-    } catch (error) {
-      handleAxiosError(error);
-      return res.status(500).send({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-      });
-    }
-  },
+  handleInteraction,
 );
 
 async function init() {
-  console.log('Initializing...');
+  console.log('Initialisation started');
   try {
-    const { access_token } = await getDiscordCredentials();
-    const url = `https://discord.com/api/v10/applications/${process.env.DISCORD_APPLICATION_ID}/commands`;
-    await axios.post(
-      url,
-      {
-        name: 'duo',
-        description: 'Get the leaderboard',
-        type: 1,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      },
-    );
-    console.log('Initialization done!');
+    await createDiscordCommand({
+      name: 'duo',
+      description: 'Get the leaderboard',
+      type: 1,
+    });
+    console.info('Initialization complete');
   } catch (error) {
-    handleAxiosError(error);
+    handleError('Error during initialisation:', error);
   }
 }
 

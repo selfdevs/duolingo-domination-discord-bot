@@ -3,7 +3,7 @@ import axios from 'axios';
 import { BASE_URL, FAKE_USER_AGENT, USER_ENDPOINT, users } from './constants';
 import { User } from './types';
 import { handleAxiosError } from './axios';
-import { createEmbed } from './discord/embed';
+import { createEmbed, createLeaderboardCanvas } from './discord/embed';
 
 export async function getUser(id: string): Promise<User> {
   const url = BASE_URL + USER_ENDPOINT + id;
@@ -31,22 +31,29 @@ export const getLeaderboard = async (channelId: string): Promise<void> => {
     });
   try {
     const url = `https://discord.com/api/v10/channels/${channelId}/messages`;
-    await axios.post(
-      url,
-      {
-        ...createEmbed(
+    const formData = new FormData();
+    const canvas = createLeaderboardCanvas(leaderboard);
+    const blob = await fetch(canvas.toDataURL('image/png')).then((res) =>
+      res.blob(),
+    );
+    formData.append('files[0]', blob, 'image.png');
+    formData.append(
+      'payload_json',
+      JSON.stringify(
+        createEmbed(
           '🦜 Duolingo Domination Leaderboard 🦜',
           prettierLeaderboard(sortedLeaderboard),
         ),
-      },
-      {
-        headers: {
-          Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-        },
-      },
+      ),
     );
+
+    await axios.post(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+      },
+    });
   } catch (error) {
-    console.log('error posting leaderboard', error);
     handleAxiosError(error);
   }
 };

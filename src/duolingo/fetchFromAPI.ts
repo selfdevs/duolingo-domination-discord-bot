@@ -36,7 +36,7 @@ export async function getUser(id: string): Promise<User> {
   const lastWeekXPResponse = await axios.get(lastWeekXPUrl, {
     headers: createHeaders(),
   });
-  lastWeekXPResponse.data.summaries.pop();
+
   return {
     ...response.data,
     lastWeekXP: getLastWeekXP(lastWeekXPResponse.data),

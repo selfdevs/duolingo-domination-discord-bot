@@ -16,4 +16,8 @@ RUN pnpm install
 
 COPY . .
 
+RUN pnpm run build
+
+RUN pnpm prune --prod
+
 CMD ["pnpm", "start"]

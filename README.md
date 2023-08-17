@@ -1,3 +1,6 @@
+> This repo is a deprecated version, check out our new version in GO at
+> https://github.com/selfdevs/go-duolingo-domination !
+
 # Duolingo Domination Discord Bot
 
 ## About
